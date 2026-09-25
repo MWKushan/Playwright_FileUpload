@@ -10,6 +10,10 @@ export class FileUploadPage {
     readonly employeeId: Locator;
     readonly profilePictureIcon: Locator;
     readonly saveButton: Locator;
+    readonly createLoginDetails: Locator;
+    readonly usernameInput: Locator;
+    readonly passwordInput: Locator;
+    readonly confirmPasswordInput: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -21,6 +25,10 @@ export class FileUploadPage {
         this.employeeId = page.getByRole('textbox').nth(4);
         this.profilePictureIcon = page.locator('form').getByRole('img', { name: 'profile picture' });
         this.saveButton = page.getByRole('button', { name: 'Save' });
+        this.createLoginDetails = page.locator('.oxd-switch-input');
+        this.usernameInput = page.getByRole('textbox').nth(5);
+        this.passwordInput = page.locator('input[type="password"]').first();
+        this.confirmPasswordInput = page.locator('input[type="password"]').nth(1);
 
         // await page.getByRole('textbox').nth(4).click();
         // await page.getByRole('textbox', { name: 'First Name' }).click();
@@ -31,12 +39,16 @@ export class FileUploadPage {
         await expect(this.profilePictureIcon).toBeVisible();
     }
 
-    async addEmployee(firstName: string, middleName: string, lastName: string, employeeId: string) {
+    async addEmployee(firstName: string, middleName: string, lastName: string, employeeId: string, username: string, password:string) {
 
     await this.firstNameInput.fill(firstName);
     await this.lastNameInput.fill(lastName);
     await this.middleNameInput.fill(middleName);
     await this.employeeId.fill(employeeId);
+    await this.createLoginDetails.click();
+    await this.usernameInput.fill(username);
+    await this.passwordInput.fill(password);
+    await this.confirmPasswordInput.fill(password);
     }
 
     async uploadProfilePicture(filePath: string) {
@@ -48,34 +60,13 @@ export class FileUploadPage {
 
   }
 
-    // After saving, OrangeHRM opens the Personal Details page with a "<first> <last>" heading
+    // After saving, OrangeHRM opens the Personal Details page with a "<first> <last>" heading.
+    // Saving with login details makes several API calls, and the public demo can take well over
+    // the default 20s expect timeout, so the save/redirect checks get a longer timeout.
     async expectEmployeeSaved(firstName: string, lastName: string) {
-        await expect(this.page).toHaveURL(/pim\/viewPersonalDetails/);
+        await expect(this.page.getByText('Successfully Saved')).toBeVisible({ timeout: 60_000 });
+        await expect(this.page).toHaveURL(/pim\/viewPersonalDetails/, { timeout: 60_000 });
         await expect(this.page.getByRole('heading', { name: `${firstName} ${lastName}` })).toBeVisible();
     }
 
   }
-
-
-// Codegen recording (kept for reference)
-// await page.getByRole('button', { name: 'Save' }).click();
-// await page.getByRole('textbox', { name: 'Username' }).click();
-// await page.getByRole('textbox', { name: 'Username' }).click();
-// await page.getByRole('textbox', { name: 'Username' }).fill('Admin');
-// await page.getByRole('textbox', { name: 'Username' }).press('Tab');
-// await page.getByRole('textbox', { name: 'Password' }).fill('admin123');
-// await page.getByRole('button', { name: 'Login' }).click();
-// await page.getByRole('textbox', { name: 'First Name' }).click();
-// await page.getByRole('textbox', { name: 'First Name' }).fill('ass');
-// await page.getByRole('textbox', { name: 'Middle Name' }).click();
-// await page.getByRole('textbox', { name: 'Middle Name' }).fill('ddd');
-// await page.getByRole('textbox', { name: 'Last Name' }).click();
-// await page.getByRole('textbox', { name: 'Last Name' }).fill('ggg');
-// await page.getByRole('textbox').nth(4).click();
-// await page.getByRole('textbox').nth(4).click();
-// await page.getByRole('button', { name: 'Save' }).click();
-// await page.locator('.oxd-input-group > div:nth-child(2)').first().click();
-// await page.getByRole('textbox').nth(4).fill('2345');
-// await page.getByRole('button', { name: 'Save' }).click();
-// await page.getByRole('heading', { name: 'ass ggg' }).click();
-// await page.getByRole('heading', { name: 'ass ggg' }).click();
