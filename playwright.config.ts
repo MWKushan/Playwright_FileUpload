@@ -1,12 +1,14 @@
 import { defineConfig, devices } from '@playwright/test';
+import path from 'path';
+import dotenv from 'dotenv';
 
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// import dotenv from 'dotenv';
-// import path from 'path';
-// dotenv.config({ path: path.resolve(__dirname, '.env') });
+const authFile = path.join(__dirname, 'playwright/.auth/admin.json');
+dotenv.config({ path: path.resolve(__dirname, '.env') });
+
+const baseURL = process.env.BASE_URL;
+if (!baseURL) {
+  throw new Error('BASE_URL must be set in .env or the environment.');
+}
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -29,19 +31,35 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
-    baseURL: 'https://opensource-demo.orangehrmlive.com/web/index.php/',
+    baseURL,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
   },
 
   /* Configure projects for major browsers */
-  projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
+  // projects: [
+  //   {
+  //     name: 'chromium',
+  //     use: { ...devices['Desktop Chrome'] },
+  //   },
 
+
+
+  projects: [
+  {
+    name: 'setup',
+    testMatch: '**/auth.setup.ts',
+  },
+  {
+    name: 'chromium',
+    testIgnore: '**/auth.setup.ts',
+    dependencies: ['setup'],
+    use: {
+      ...devices['Desktop Chrome'],
+      storageState: authFile,
+    },
+  },
     // {
     //   name: 'firefox',
     //   use: { ...devices['Desktop Firefox'] },

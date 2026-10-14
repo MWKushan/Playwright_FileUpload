@@ -16,6 +16,13 @@ npm install
 npx playwright install
 ````
 
+## Environment variables
+
+Copy `.env.example` to `.env` and set your test account credentials. The `.env` file is ignored by Git.
+`BASE_URL` is the application URL used by Playwright; update it when running against another environment.
+In GitHub Actions, configure `TEST_USERNAME` and `TEST_PASSWORD` as repository secrets. The workflow sets
+`BASE_URL` to the public OrangeHRM demo URL.
+
 ## Run only the file upload spec
 
 ```powershell
@@ -60,4 +67,3 @@ This project also includes a simple Playwright API testing example using JSONPla
 ```powershell
 npx playwright test tests/apiValidation.spec.ts
 ```
-

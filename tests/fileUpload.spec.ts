@@ -1,14 +1,11 @@
 import { test, expect } from '@playwright/test';
 import { faker } from '@faker-js/faker';
 import { FileUploadPage } from '../pages/fileUpload';
-import { LoginPage } from '../pages/LoginPage';
-import { employeeData } from '../test-data/employeeData';
-import { loginData } from '../test-data/loginData';
+import employeeData from '../test-data/employeeData.json';
 
 test('user can enter employee details', async ({ page }) => {
   // Login + save with login details + photo upload can take over 90s on the shared demo server
   test.setTimeout(180_000);
-  const loginPage = new LoginPage(page);
   const fileUploadPage = new FileUploadPage(page);
 
   const firstName = faker.person.firstName();
@@ -21,10 +18,7 @@ test('user can enter employee details', async ({ page }) => {
   const username = `${firstName}${employeeId}`;
   const password = faker.internet.password({ length: 12, memorable: false });
 
-  await loginPage.goto();
-  await loginPage.login(loginData.username, loginData.password);
-  await loginPage.expectDashboard();
-  
+  // Already logged in as admin via the saved session (playwright/.auth/admin.json)
   await fileUploadPage.gotoAddEmployee();
   await fileUploadPage.addEmployee(
     firstName,

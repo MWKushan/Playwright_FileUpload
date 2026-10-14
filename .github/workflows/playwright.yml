@@ -20,6 +20,10 @@ jobs:
       run: npx playwright install --with-deps chromium
     - name: Run Playwright tests
       run: npm run test:employee-flow
+      env:
+        TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
+        TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+        BASE_URL: https://opensource-demo.orangehrmlive.com/web/index.php/
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:

@@ -3,7 +3,7 @@ import { faker } from '@faker-js/faker';
 import { FileUploadPage } from '../pages/fileUpload';
 import { LoginPage } from '../pages/LoginPage';
 import { LogoutPage } from '../pages/LogoutPage';
-import { employeeData } from '../test-data/employeeData';
+import employeeData from '../test-data/employeeData.json';
 import { loginData } from '../test-data/loginData';
 
 // These steps depend on each other (step 3 logs in with the user created in step 1),
@@ -12,9 +12,7 @@ test.describe.configure({ mode: 'serial' });
 
 let page: Page;
 
-const firstName = faker.person.firstName();
-const middleName = faker.person.firstName();
-const lastName = faker.person.lastName();
+const { firstName, middleName, lastName } = employeeData;
 // The public demo holds thousands of records, so derive the ID from the clock to avoid
 // "Employee Id already exists" (OrangeHRM allows up to 10 characters)
 const employeeId = Date.now().toString().slice(-8);
@@ -23,7 +21,8 @@ const username = `${firstName}${employeeId}`;
 const password = faker.internet.password({ length: 12, memorable: false });
 
 test.beforeAll(async ({ browser }) => {
-  page = await browser.newPage();
+  // This flow logs in and out itself, so start without the saved admin session
+  page = await browser.newPage({ storageState: { cookies: [], origins: [] } });
 });
 
 test.afterAll(async () => {
