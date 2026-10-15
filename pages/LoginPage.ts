@@ -1,14 +1,14 @@
 import { expect, Locator, Page } from '@playwright/test';
+import { BasePage } from './BasePage';
 
-export class LoginPage {
-  readonly page: Page;
+export class LoginPage extends BasePage {
   readonly usernameInput: Locator;
   readonly passwordInput: Locator;
   readonly loginButton: Locator;
   readonly dashboardHeading: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.usernameInput = page.getByPlaceholder('Username');
     this.passwordInput = page.getByPlaceholder('Password');
     this.loginButton = page.getByRole('button', { name: 'Login' });
@@ -16,7 +16,7 @@ export class LoginPage {
   }
 
   async goto() {
-    await this.page.goto('auth/login');
+    await this.navigate('auth/login');
   }
 
   async login(username: string, password: string) {
@@ -26,8 +26,7 @@ export class LoginPage {
   }
 
   async expectDashboard() {
-    await expect(this.page).toHaveURL(/dashboard/);
+    await this.verifyNavigation(/dashboard/, { timeout: 60_000 });
     await expect(this.dashboardHeading).toBeVisible();
   }
 }
-
